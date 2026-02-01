@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap");
+
+@import "tailwindcss";
+
+body {
+    font-family: "Inter", sans-serif;
+    background: #f9fafb;
+    color: #111827;
+}
+
+.option-card {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 10px;
+}
+
+.btn-primary {
+    @apply w-full py-4 rounded-2xl bg-black text-white font-bold hover:bg-gray-800 transition-all active:scale-[0.98];
+}

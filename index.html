@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="keywords"
+            content="AI 测验, 快速生成, 关键词, 描述, JSON 格式, 在线工具"
+        />
+        <meta
+            name="description"
+            content="Vibe Quiz：一个快捷的测验工具。只需提供关键词和描述，AI 即可根据格式迅速生成测验内容，您只需复制 JSON 即可开始测验。"
+        />
+        <title>Vibe Quiz | 快捷的测验工具</title>
+    </head>
+    <body>
+        <!-- Import View -->
+        <div id="importContainer" class="view-container">
+            <div class="min-h-screen flex items-center justify-center p-4">
+                <div
+                    class="w-full max-w-2xl bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden"
+                >
+                    <div class="p-8">
+                        <h1 class="text-2xl font-extrabold mb-2">
+                            🧠 VibeQuiz
+                        </h1>
+                        <p class="text-gray-500 mb-6">Import JSON to start.</p>
+                        <textarea
+                            id="jsonInput"
+                            placeholder='[{"question": "...", "keys": ["..."], "distractors": ["..."]}]'
+                            class="w-full h-64 p-4 bg-gray-50 border border-gray-200 rounded-2xl font-mono text-sm focus:ring-2 focus:ring-black outline-none transition-all custom-scrollbar"
+                        ></textarea>
+                        <button id="importBtn" class="btn-primary mt-6">
+                            Start Quiz →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz View -->
+        <div id="quizContainer" class="view-container hidden">
+            <div class="min-h-screen flex items-center justify-center p-4">
+                <div
+                    class="w-full max-w-2xl bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden"
+                >
+                    <div id="progressBar" class="h-2 bg-gray-100 w-full">
+                        <div
+                            id="progressFill"
+                            class="h-full bg-black transition-all duration-500"
+                            style="width: 0%"
+                        ></div>
+                    </div>
+                    <div class="p-8">
+                        <div class="flex justify-between items-center mb-8">
+                            <span
+                                id="questionCounter"
+                                class="text-xs font-bold uppercase tracking-widest text-gray-400"
+                                >Q 1/0</span
+                            >
+                        </div>
+                        <h2
+                            id="questionText"
+                            class="text-xl font-bold mb-8 leading-snug"
+                        ></h2>
+                        <div class="space-y-3" id="optionsContainer">
+                            <!-- Options will be dynamically populated -->
+                        </div>
+                        <div class="mt-10">
+                            <button id="submitBtn" class="btn-primary hidden">
+                                Check Answer
+                            </button>
+                            <button
+                                id="nextBtn"
+                                class="w-full py-4 rounded-2xl bg-blue-600 text-white font-bold hidden"
+                            >
+                                Next Question →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report View -->
+        <div id="reportContainer" class="view-container hidden">
+            <div class="min-h-screen flex items-center justify-center p-4">
+                <div
+                    class="w-full max-w-2xl bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden"
+                >
+                    <div
+                        class="p-8 max-h-[90vh] overflow-y-auto custom-scrollbar"
+                    >
+                        <div class="text-center mb-10">
+                            <div id="resultEmoji" class="text-5xl mb-4"></div>
+                            <h1
+                                id="resultPercentage"
+                                class="text-4xl font-black"
+                            ></h1>
+                            <p id="resultScore" class="text-gray-500"></p>
+                        </div>
+
+                        <div
+                            id="aiPromptSection"
+                            class="mb-8 p-6 bg-red-50/50 border border-red-100 rounded-3xl hidden"
+                        >
+                            <div class="flex items-center justify-between mb-4">
+                                <h3
+                                    class="text-sm font-black text-red-500 uppercase tracking-widest"
+                                >
+                                    Consolidated AI Prompt
+                                </h3>
+                                <span
+                                    class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded-full font-bold"
+                                    >BATCH MODE</span
+                                >
+                            </div>
+                            <p
+                                class="text-xs text-red-400 mb-3 leading-relaxed"
+                            >
+                                Copy the text below into your favorite AI
+                                (GPT-4/Claude) to analyze all mistakes at once.
+                            </p>
+                            <textarea
+                                id="aiPrompt"
+                                readonly
+                                class="w-full h-80 p-4 text-xs font-mono bg-white border border-red-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-400 custom-scrollbar"
+                            ></textarea>
+                            <div class="mt-4 text-center">
+                                <p class="text-[10px] text-gray-400">
+                                    Click the box to select all text
+                                </p>
+                            </div>
+                        </div>
+
+                        <div
+                            id="perfectScoreMessage"
+                            class="p-12 text-center bg-green-50 rounded-3xl text-green-700 font-bold mb-8 italic hidden"
+                        >
+                            "Perfect precision. You've mastered this set."
+                        </div>
+
+                        <button id="restartBtn" class="btn-primary">
+                            Restart Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="module" src="/src/main.ts"></script>
+    </body>
+</html>
