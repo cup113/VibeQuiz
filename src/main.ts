@@ -85,9 +85,9 @@ function isQuestionCorrect(question: QuizQuestion): boolean {
 }
 
 function generateBatchAIPrompt(incorrectQuestions: QuizQuestion[]): string {
-  const header = `AI Workflow:
-1. 评估题目质量（无歧义性、区分度）：1~5.
-2. 针对以下所有错题，逐一解释为什么我的答案不对，标答又正确在哪里。
+  const header = `AI工作流程：
+1. 评估题目质量（无歧义性、区分度）：1~5分。
+2. 针对以下所有错题，逐一解释为什么我的答案不对，正确答案又为什么正确。
 3. 最后总结我在这组题目中暴露出的核心知识盲区。
 
 ---
@@ -152,7 +152,7 @@ function updateProgress(): void {
 }
 
 function updateQuestionCounter(): void {
-  DOM.questionCounter.textContent = `Q ${state.currentIndex + 1}/${state.quizData.length}`;
+  DOM.questionCounter.textContent = `第 ${state.currentIndex + 1}/${state.quizData.length} 题`;
 }
 
 function createOptionElement(
@@ -225,8 +225,8 @@ function renderQuizView(): void {
     // Update next button text
     DOM.nextBtn.textContent =
       state.currentIndex === state.quizData.length - 1
-        ? "View Results"
-        : "Next Question →";
+        ? "查看结果"
+        : "下一题 →";
   } else {
     DOM.submitBtn.classList.remove("hidden");
     DOM.nextBtn.classList.add("hidden");
@@ -242,7 +242,7 @@ function renderReportView(): void {
   // Update result display
   DOM.resultEmoji.textContent = percentage > 70 ? "🎉" : "💡";
   DOM.resultPercentage.textContent = `${percentage}%`;
-  DOM.resultScore.textContent = `Correct: ${state.score} / ${state.quizData.length}`;
+  DOM.resultScore.textContent = `正确：${state.score} / ${state.quizData.length}`;
 
   // Show/hide AI prompt section
   if (incorrectQuestions.length > 0) {
@@ -254,7 +254,7 @@ function renderReportView(): void {
 
     // Update prompt title
     const titleElement = DOM.aiPromptSection.querySelector("h3") as HTMLElement;
-    titleElement.textContent = `Consolidated AI Prompt (${incorrectQuestions.length} errors)`;
+    titleElement.textContent = `整合AI提示词 (${incorrectQuestions.length} 个错误)`;
   } else {
     DOM.aiPromptSection.classList.add("hidden");
     DOM.perfectScoreMessage.classList.remove("hidden");
@@ -296,7 +296,7 @@ function importJSON(raw: string): void {
     showView("quiz");
     renderQuizView();
   } catch (error) {
-    alert("❌ Invalid JSON format.");
+    alert("❌ JSON格式无效。");
   }
 }
 

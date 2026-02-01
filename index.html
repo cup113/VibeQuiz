@@ -2,17 +2,17 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
             name="keywords"
-            content="AI 测验, 快速生成, 关键词, 描述, JSON 格式, 在线工具"
+            content="AI测验生成器, JSON测验导入, 交互式测验工具, 教育评估, 多选题测验, 学习工具, 测验创建器, AI驱动测验, 学习工具, 测试生成器"
         />
         <meta
             name="description"
-            content="Vibe Quiz：一个快捷的测验工具。只需提供关键词和描述，AI 即可根据格式迅速生成测验内容，您只需复制 JSON 即可开始测验。"
+            content="Vibe Quiz: AI智能测验生成器与交互式学习工具。通过AI提示生成测验，导入JSON格式问题，进行交互式评估，并获取AI驱动的错误分析来提升知识掌握度。"
         />
-        <title>Vibe Quiz | 快捷的测验工具</title>
+        <title>Vibe Quiz: AI智能测验生成器与交互式学习工具</title>
     </head>
     <body>
         <!-- Import View -->
@@ -25,14 +25,85 @@
                         <h1 class="text-2xl font-extrabold mb-2">
                             🧠 VibeQuiz
                         </h1>
-                        <p class="text-gray-500 mb-6">Import JSON to start.</p>
+                        <p class="text-gray-500 mb-4">导入JSON开始测验。</p>
+
+                        <details
+                            class="mb-6 bg-blue-50/50 border border-blue-100 rounded-2xl p-4"
+                        >
+                            <summary
+                                class="cursor-pointer text-blue-700 font-semibold text-sm flex items-center gap-2"
+                            >
+                                <span>📝 如何使用AI提示生成JSON</span>
+                            </summary>
+                            <div class="mt-4 space-y-4">
+                                <div class="text-sm text-gray-700">
+                                    <p class="mb-2">
+                                        复制此提示词模板，向AI（GPT-4/Claude）请求生成测验问题：
+                                    </p>
+
+                                    <div
+                                        class="bg-white p-4 rounded-xl border border-gray-200 text-xs font-mono mb-3"
+                                    >
+                                        <pre>
+# Capabilities & Rules:
+
+【根据你的主题性质引导AI生成题目】
+
+## 干扰项设计 (Distractor Quality)
+
+- **避免主观**：干扰项必须有据可查。
+- **难度适中**：干扰项应具有迷惑性，能够区分"模糊记忆"与"精准掌握"。
+- **选项数量**：每题 3-6 个选项，若考点单一可设为 3-4 个。
+
+# Output Format:
+
+仅输出一个 JSON 代码块，格式如下：
+
+```typescript
+Array&lt;{
+  question: string, // 题干，需标明题目类型（单选/多选）
+  keys: string[],   // 正确答案数组
+  distractors: string[] // 干扰项数组
+}&gt;
+```</pre
+                                        >
+                                    </div>
+
+                                    <div
+                                        class="text-xs text-gray-500 space-y-1"
+                                    >
+                                        <p class="flex items-center gap-1">
+                                            <span
+                                                class="inline-block w-2 h-2 bg-green-500 rounded-full"
+                                            ></span>
+                                            <strong>示例1（历史）：</strong>
+                                            "生成5个关于第二次世界大战的多选题..."
+                                        </p>
+                                        <p class="flex items-center gap-1">
+                                            <span
+                                                class="inline-block w-2 h-2 bg-blue-500 rounded-full"
+                                            ></span>
+                                            <strong>示例2 （编程）：</strong>
+                                            "创建3个关于async/await的JavaScript问题..."
+                                        </p>
+                                        <p class="flex items-center gap-1">
+                                            <span
+                                                class="inline-block w-2 h-2 bg-purple-500 rounded-full"
+                                            ></span>
+                                            <strong>示例3（医学）：</strong>
+                                            "制作4个带临床场景的解剖学问题..."
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
                         <textarea
                             id="jsonInput"
                             placeholder='[{"question": "...", "keys": ["..."], "distractors": ["..."]}]'
                             class="w-full h-64 p-4 bg-gray-50 border border-gray-200 rounded-2xl font-mono text-sm focus:ring-2 focus:ring-black outline-none transition-all custom-scrollbar"
                         ></textarea>
                         <button id="importBtn" class="btn-primary mt-6">
-                            Start Quiz →
+                            开始测验 →
                         </button>
                     </div>
                 </div>
@@ -57,7 +128,7 @@
                             <span
                                 id="questionCounter"
                                 class="text-xs font-bold uppercase tracking-widest text-gray-400"
-                                >Q 1/0</span
+                                >第 1/0 题</span
                             >
                         </div>
                         <h2
@@ -69,13 +140,13 @@
                         </div>
                         <div class="mt-10">
                             <button id="submitBtn" class="btn-primary hidden">
-                                Check Answer
+                                检查答案
                             </button>
                             <button
                                 id="nextBtn"
                                 class="w-full py-4 rounded-2xl bg-blue-600 text-white font-bold hidden"
                             >
-                                Next Question →
+                                下一题 →
                             </button>
                         </div>
                     </div>
@@ -109,18 +180,17 @@
                                 <h3
                                     class="text-sm font-black text-red-500 uppercase tracking-widest"
                                 >
-                                    Consolidated AI Prompt
+                                    整合AI提示词
                                 </h3>
                                 <span
                                     class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded-full font-bold"
-                                    >BATCH MODE</span
+                                    >批量模式</span
                                 >
                             </div>
                             <p
                                 class="text-xs text-red-400 mb-3 leading-relaxed"
                             >
-                                Copy the text below into your favorite AI
-                                (GPT-4/Claude) to analyze all mistakes at once.
+                                将下方文本复制到您常用的AI（GPT-4/Claude）中，一次性分析所有错误。
                             </p>
                             <textarea
                                 id="aiPrompt"
@@ -129,7 +199,7 @@
                             ></textarea>
                             <div class="mt-4 text-center">
                                 <p class="text-[10px] text-gray-400">
-                                    Click the box to select all text
+                                    点击文本框全选文本
                                 </p>
                             </div>
                         </div>
@@ -138,11 +208,11 @@
                             id="perfectScoreMessage"
                             class="p-12 text-center bg-green-50 rounded-3xl text-green-700 font-bold mb-8 italic hidden"
                         >
-                            "Perfect precision. You've mastered this set."
+                            "完美掌握！您已经完全掌握这组题目。"
                         </div>
 
                         <button id="restartBtn" class="btn-primary">
-                            Restart Session
+                            重新开始
                         </button>
                     </div>
                 </div>
