@@ -38,32 +38,35 @@
                             <div class="mt-4 space-y-4">
                                 <div class="text-sm text-gray-700">
                                     <p class="mb-2">
-                                        复制此提示词模板，向AI（GPT-4/Claude）请求生成测验问题：
+                                        复制此提示词模板，向你最喜欢的 AI
+                                        请求生成测验问题：
                                     </p>
 
                                     <div
                                         class="bg-white p-4 rounded-xl border border-gray-200 text-xs font-mono mb-3"
                                     >
                                         <pre>
-# Capabilities & Rules:
+# 能力与规则：
 
-【根据你的主题性质引导AI生成题目】
+## 出题方向
 
-## 干扰项设计 (Distractor Quality)
+【输入你的出题方向】
+
+## 干扰项设计（Distractor Quality）
 
 - **避免主观**：干扰项必须有据可查。
 - **难度适中**：干扰项应具有迷惑性，能够区分"模糊记忆"与"精准掌握"。
-- **选项数量**：每题 3-6 个选项，若考点单一可设为 3-4 个。
+- **选项数量**：每题总共 3-6 个选项，若考点单一可设为 3-4 个。
 
-# Output Format:
+# 输出格式：
 
-仅输出一个 JSON 代码块，格式如下：
+输出一个 JSON 代码块，格式如下：
 
 ```typescript
 Array&lt;{
-  question: string, // 题干，需标明题目类型（单选/多选）
-  keys: string[],   // 正确答案数组
-  distractors: string[] // 干扰项数组
+    question: string, // 题干，需标明题目类型（单选/多选）
+    keys: string[],   // 正确答案数组
+    distractors: string[] // 干扰项数组
 }&gt;
 ```</pre
                                         >
@@ -76,15 +79,17 @@ Array&lt;{
                                             <span
                                                 class="inline-block w-2 h-2 bg-green-500 rounded-full"
                                             ></span>
-                                            <strong>示例1（历史）：</strong>
-                                            "生成5个关于第二次世界大战的多选题..."
+                                            <strong>示例 1（历史）：</strong>
+                                            生成 5
+                                            个关于第二次世界大战的多选题。
                                         </p>
                                         <p class="flex items-center gap-1">
                                             <span
                                                 class="inline-block w-2 h-2 bg-blue-500 rounded-full"
                                             ></span>
-                                            <strong>示例2 （编程）：</strong>
-                                            "创建3个关于async/await的JavaScript问题..."
+                                            <strong>示例 2 （编程）：</strong>
+                                            创建 3 个关于 async/await 的
+                                            JavaScript 问题。
                                         </p>
                                         <p class="flex items-center gap-1">
                                             <span
@@ -190,7 +195,8 @@ Array&lt;{
                             <p
                                 class="text-xs text-red-400 mb-3 leading-relaxed"
                             >
-                                将下方文本复制到您常用的AI（GPT-4/Claude）中，一次性分析所有错误。
+                                将下方文本复制到您常用的 AI
+                                中，一次性分析所有错误。
                             </p>
                             <textarea
                                 id="aiPrompt"

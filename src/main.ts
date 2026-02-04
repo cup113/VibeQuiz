@@ -85,12 +85,11 @@ function isQuestionCorrect(question: QuizQuestion): boolean {
 }
 
 function generateBatchAIPrompt(incorrectQuestions: QuizQuestion[]): string {
-  const header = `AI工作流程：
-1. 评估题目质量（无歧义性、区分度）：1~5分。
-2. 针对以下所有错题，逐一解释为什么我的答案不对，正确答案又为什么正确。
-3. 最后总结我在这组题目中暴露出的核心知识盲区。
-
----
+  const header = `工作流程：
+1. 针对每一道错题：
+  1.1. 评估题目质量（无歧义性、区分度）：1~5分。
+  1.2. 解释为什么我的答案不对，正确答案又为什么正确。
+2. 最后总结我在这组题目中暴露出的核心知识盲区。
 `;
 
   const body = incorrectQuestions
