@@ -11,6 +11,7 @@ import {
 import apiRouter from "./api.js";
 import * as session from "./session.js";
 import type { QuestionData } from "../src/types.js";
+import { formatCheckResults } from "./format.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -129,7 +130,7 @@ mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [
             {
               type: "text",
-              text: JSON.stringify({ status: "pending" }),
+              text: "Status: pending",
             },
           ],
         };
@@ -139,13 +140,7 @@ mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify({
-              status: "completed",
-              score: s.results.score,
-              total: s.questions.length,
-              percentage: Math.round((s.results.score / s.questions.length) * 100),
-              questions: s.results.questions,
-            }),
+            text: `Status: completed\n\n${formatCheckResults(s.results, s.questions.length)}`,
           },
         ],
       };
@@ -227,18 +222,12 @@ if (transportMode === "sse") {
             return { content: [{ type: "text", text: "Session not found or expired" }], isError: true };
           }
           if (!s.results) {
-            return { content: [{ type: "text", text: JSON.stringify({ status: "pending" }) }] };
+            return { content: [{ type: "text", text: "Status: pending" }] };
           }
           return {
             content: [{
               type: "text",
-              text: JSON.stringify({
-                status: "completed",
-                score: s.results.score,
-                total: s.questions.length,
-                percentage: Math.round((s.results.score / s.questions.length) * 100),
-                questions: s.results.questions,
-              }),
+              text: `Status: completed\n\n${formatCheckResults(s.results, s.questions.length)}`,
             }],
           };
         }
