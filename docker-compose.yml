@@ -1,0 +1,9 @@
+services:
+  vibe-quiz:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - MCP_TRANSPORT=sse
+      - BASE_URL=http://your-domain.com:3001
+    restart: unless-stopped
