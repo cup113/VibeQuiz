@@ -18,6 +18,10 @@ const app = express();
 app.use(express.json({ limit: "5mb" }));
 app.use("/api", apiRouter);
 
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok" });
+});
+
 const distPath = path.resolve(__dirname, "../dist");
 app.use(express.static(distPath));
 
