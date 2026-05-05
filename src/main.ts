@@ -1,11 +1,7 @@
 import "./style.css";
+import type { QuestionData, QuizResults } from "./types.js";
 
 // ----------------- Type Definitions -----------------
-type QuestionData = {
-  question: string;
-  keys: string[];
-  distractors: string[];
-};
 
 type QuizQuestion = {
   question: string;
@@ -19,6 +15,7 @@ type AppState = {
   quizData: QuizQuestion[];
   currentIndex: number;
   score: number;
+  sessionId: string | null;
 };
 
 // ----------------- DOM Elements -----------------
@@ -58,6 +55,7 @@ const state: AppState = {
   quizData: [],
   currentIndex: 0,
   score: 0,
+  sessionId: null,
 };
 
 // ----------------- Helper Functions -----------------
@@ -261,41 +259,74 @@ function renderReportView(): void {
 }
 
 // ----------------- Core Logic -----------------
+function startQuiz(data: QuestionData[]): void {
+  state.quizData = data.map((item) => {
+    const options = [
+      ...item.keys.map((key) => ({ text: key, isCorrect: true })),
+      ...item.distractors.map((distractor) => ({
+        text: distractor,
+        isCorrect: false,
+      })),
+    ];
+
+    return {
+      question: item.question,
+      options: shuffleArray(options),
+      userSelectedIndices: [],
+      isSubmitted: false,
+    };
+  });
+
+  state.quizData = shuffleArray(state.quizData);
+  state.currentIndex = 0;
+  state.score = 0;
+  state.view = "quiz";
+
+  showView("quiz");
+  renderQuizView();
+}
+
 function importJSON(raw: string): void {
   try {
     const data = JSON.parse(raw) as QuestionData[];
-
-    // Transform and shuffle data
-    state.quizData = data.map((item) => {
-      const options = [
-        ...item.keys.map((key) => ({ text: key, isCorrect: true })),
-        ...item.distractors.map((distractor) => ({
-          text: distractor,
-          isCorrect: false,
-        })),
-      ];
-
-      return {
-        question: item.question,
-        options: shuffleArray(options),
-        userSelectedIndices: [],
-        isSubmitted: false,
-      };
-    });
-
-    // Shuffle questions
-    state.quizData = shuffleArray(state.quizData);
-
-    // Reset state
-    state.currentIndex = 0;
-    state.score = 0;
-    state.view = "quiz";
-
-    // Update views
-    showView("quiz");
-    renderQuizView();
+    startQuiz(data);
   } catch (error) {
     alert("❌ JSON格式无效。");
+  }
+}
+
+async function loadQuizFromServer(sessionId: string): Promise<void> {
+  try {
+    const response = await fetch(`/api/quiz/${sessionId}`);
+    if (!response.ok) throw new Error();
+    const data = (await response.json()) as QuestionData[];
+    startQuiz(data);
+  } catch {
+    alert("❌ 无法加载测验，请检查链接是否有效。");
+  }
+}
+
+async function submitResultsToServer(): Promise<void> {
+  if (!state.sessionId) return;
+
+  const results: QuizResults = {
+    questions: state.quizData.map((q) => ({
+      question: q.question,
+      options: q.options,
+      userSelectedIndices: q.userSelectedIndices,
+      isCorrect: isQuestionCorrect(q),
+    })),
+    score: state.score,
+  };
+
+  try {
+    await fetch(`/api/submit/${state.sessionId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(results),
+    });
+  } catch {
+    // Silent fail — results still shown on screen
   }
 }
 
@@ -331,6 +362,9 @@ function goToNextQuestion(): void {
     state.currentIndex++;
     renderQuizView();
   } else {
+    if (state.sessionId) {
+      submitResultsToServer();
+    }
     state.view = "report";
     showView("report");
     renderReportView();
@@ -342,6 +376,7 @@ function restartSession(): void {
   state.quizData = [];
   state.currentIndex = 0;
   state.score = 0;
+  state.sessionId = null;
 
   // Clear input
   DOM.jsonInput.value = "";
@@ -404,7 +439,16 @@ function init(): void {
   // Set up event listeners
   setupEventListeners();
 
-  // Show initial view
+  // Check for MCP session from URL (?s=<sessionId>)
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get("s");
+  if (sessionId) {
+    state.sessionId = sessionId;
+    loadQuizFromServer(sessionId);
+    return;
+  }
+
+  // Show initial view (standalone mode)
   showView(state.view);
 }
 
