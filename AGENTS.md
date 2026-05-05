@@ -46,12 +46,12 @@ F:\projects\VibeQuiz/
 
 - **MCP Protocol** — `@modelcontextprotocol/sdk` with dual transport:
   - **stdio** (default, local): spawned by MCP client as subprocess
-  - **SSE** (remote, `MCP_TRANSPORT=sse`): exposes `GET /mcp` SSE endpoint for remote MCP clients
+  - **Streamable HTTP** (remote, `MCP_TRANSPORT=sse`): exposes `/mcp` endpoint for remote MCP clients
   - Two tools: `create_quiz` and `check_results`
 - **HTTP Server** — Express, serves built frontend (`dist/`) + REST API
   - `GET /api/quiz/:id` — returns quiz questions for a session
   - `POST /api/submit/:id` — receives user answers, stores in session
-  - `GET /mcp` + `POST /mcp/message` — SSE transport endpoints (only when `MCP_TRANSPORT=sse`)
+  - `GET /mcp` + `POST /mcp` — Streamable HTTP transport endpoint (only when `MCP_TRANSPORT=sse`)
 - **Session Store** — `Map<string, Session>` persisted to `.sessions.json` (disk), 1-hour TTL, auto-cleanup every 10 minutes
 
 ## Data Flow
@@ -91,7 +91,7 @@ $env:BASE_URL="http://localhost:5173"; pnpm dev:server
 pnpm build
 pnpm start
 
-# Production with SSE transport (for remote/Docker)
+# Production with Streamable HTTP transport (for remote/Docker)
 $env:MCP_TRANSPORT="sse"; pnpm start
 ```
 
@@ -120,6 +120,7 @@ services:
     environment:
       - MCP_TRANSPORT=sse
       - BASE_URL=http://your-domain.com:3001
+    restart: unless-stopped
 ```
 
 ## MCP Client Configuration
@@ -137,7 +138,7 @@ services:
 }
 ```
 
-### Remote (SSE)
+### Remote (Streamable HTTP)
 ```json
 {
   "mcpServers": {

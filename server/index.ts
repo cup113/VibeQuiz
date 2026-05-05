@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -158,26 +158,17 @@ mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
 const transportMode = process.env.MCP_TRANSPORT || "stdio";
 
 if (transportMode === "sse") {
-  const transports = new Map<string, SSEServerTransport>();
-
-  app.get("/mcp", async (req, res) => {
-    const transport = new SSEServerTransport("/mcp/message", res);
-    transports.set(transport.sessionId, transport);
-    res.on("close", () => transports.delete(transport.sessionId));
-    await mcpServer.connect(transport);
+  const transport = new StreamableHTTPServerTransport();
+  mcpServer.connect(transport).catch((err) => {
+    console.error("[VibeQuiz] MCP server error:", err);
+    process.exit(1);
   });
 
-  app.post("/mcp/message", async (req, res) => {
-    const sessionId = req.query.sessionId as string;
-    const transport = transports.get(sessionId);
-    if (transport) {
-      await transport.handlePostMessage(req, res);
-    } else {
-      res.status(404).json({ error: "No active MCP session" });
-    }
+  app.all("/mcp", async (req, res) => {
+    await transport.handleRequest(req, res, req.body);
   });
 
-  console.error(`[VibeQuiz] MCP transport: SSE at ${BASE_URL}/mcp`);
+  console.error(`[VibeQuiz] MCP transport: Streamable HTTP at ${BASE_URL}/mcp`);
 } else {
   const transport = new StdioServerTransport();
   mcpServer.connect(transport).catch((err) => {
